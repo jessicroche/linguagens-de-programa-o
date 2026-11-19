@@ -2,6 +2,8 @@ module Lexer where
 
 import Data.Char (isDigit, isSpace)
 
+type Id =  String
+
 data Token = TokNum Int 
            | TokSum
            | TokMult
@@ -12,11 +14,21 @@ data Token = TokNum Int
            deriving (Show, Eq)
 
 data Expr = Num Int 
+          | Boolean Bool
           | Sum Expr Expr 
           | Mult Expr Expr 
           | Sub Expr Expr
           | Div Expr Expr
+          | Equal Expr Expr
+          | If Expr Expr Expr
+          | Var Id
+          | Lam Id Expr
+          | App Expr Expr
           deriving (Show, Eq)
+
+data Ty = TInt
+        | TBool
+        deriving (Show, Eq)
 
 lexer :: String -> [Token]
 lexer [] = []
@@ -33,3 +45,6 @@ lexer (c:cs) | isSpace c = lexer cs
 lexNum :: String -> [Token]
 lexNum cs = case span isDigit cs of 
               (numStr, rest) -> TokNum (read numStr) : lexer rest 
+
+-- App (Lam "x" (Sum(Var "x") (Num 2)))(Num 10)
+-- subst( Sum (Var "x") (Num 2) "x") (Num 10)

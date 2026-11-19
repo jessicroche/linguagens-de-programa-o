@@ -1,6 +1,22 @@
 import Lexer
 import Parser
 
+subst :: Expr -> Id -> Expr -> Expr
+subst(Var y) x v
+          | x == y      = v
+          | otherwise = Var y
+subst(App e1 e2) x v = App (subst e1 x v) (subst e2 x v)
+subst (Lam y body) x v 
+          | x == y      = Lam y body
+          | otherwise = Lam y (subst body x v)
+subst (Sum e1 e2) x v = Sum(subst e1 x v ) (subst e2 x v)
+subst (Mult e1 e2) x v = Mult(subst e1 x v) (subst e2 x v)
+subst (Sub e1 e2) x v = Sub(subst e1 x v ) (subst e2 x v)
+subst (Div e1 e2) x v = Div(subst e1 x v ) (subst e2 x v)
+subst (Equal e1 e2 ) x v = Equal (subst e1 x v ) (subst e2 x v) 
+subst (If e1 e2 e3) x v = If(subst e1 x v) (subst e2 x v) (subst e3 x v)
+subst e _ _ = e
+
 eval :: Expr -> Int 
 eval (Num n) = n 
 eval (Sum e1 e2) = 
